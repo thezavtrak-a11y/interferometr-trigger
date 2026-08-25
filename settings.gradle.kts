@@ -23,5 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My Application"
+rootProject.name = "interferometr-trigger"
 include(":app")

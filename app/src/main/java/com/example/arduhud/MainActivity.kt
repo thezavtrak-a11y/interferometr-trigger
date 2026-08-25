@@ -38,7 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
-    ) { /* Wi-Fi connect will retry after grant */ }
+    ) {
+        viewModel.onBluetoothReady()
+    }
 
     private val batteryReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        requestWifiPermissions()
+        requestLinkPermissions()
 
         onBackPressedDispatcher.addCallback(this, settingsBackCallback)
 
@@ -85,6 +87,48 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        handleBleDebugIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleBleDebugIntent(intent)
+    }
+
+    /**
+     * adb: am start -n com.example.arduhud/.MainActivity \
+     *   --ez ble_register true --es ble_host AA:BB:CC:DD:EE:FF
+     */
+    private fun handleBleDebugIntent(intent: Intent?) {
+        if (intent == null) return
+        val register = intent.getBooleanExtra(EXTRA_BLE_REGISTER, false)
+        val host = intent.getStringExtra(EXTRA_BLE_HOST)
+        val openPad = intent.getBooleanExtra(EXTRA_OPEN_TOUCHPAD, false)
+        if (!register && host.isNullOrBlank() && !openPad) return
+        intent.removeExtra(EXTRA_BLE_REGISTER)
+        intent.removeExtra(EXTRA_BLE_HOST)
+        intent.removeExtra(EXTRA_OPEN_TOUCHPAD)
+        if (openPad) {
+            openTouchpad()
+            return
+        }
+        openSettingsScreen()
+        viewPager.post {
+            if (register) {
+                viewModel.registerDirectBle(this)
+            }
+            if (!host.isNullOrBlank()) {
+                viewPager.postDelayed({
+                    viewModel.connectBleHost(host)
+                }, 8_000L)
+            } else if (register) {
+                viewPager.postDelayed({
+                    viewModel.connectPreferredBleHost()
+                }, 8_000L)
+            }
+        }
     }
 
     override fun onStart() {
@@ -103,6 +147,25 @@ class MainActivity : AppCompatActivity() {
         if (::viewPager.isInitialized) viewPager.setCurrentItem(0, false)
     }
 
+    fun openTouchpad() {
+        openSensorScreen()
+        if (!::viewPager.isInitialized) return
+        viewPager.post {
+            val main = findMainFragment()
+            if (main != null) {
+                main.showTouchpad()
+            } else {
+                viewPager.postDelayed({ findMainFragment()?.showTouchpad() }, 200)
+            }
+        }
+    }
+
+    private fun findMainFragment(): com.example.arduhud.ui.MainFragment? {
+        return supportFragmentManager.fragments
+            .filterIsInstance<com.example.arduhud.ui.MainFragment>()
+            .firstOrNull()
+    }
+
     fun openSettingsScreen() {
         if (::viewPager.isInitialized) viewPager.setCurrentItem(1, false)
     }
@@ -115,7 +178,7 @@ class MainActivity : AppCompatActivity() {
         return ::viewPager.isInitialized && viewPager.currentItem == 1
     }
 
-    private fun requestWifiPermissions() {
+    private fun requestLinkPermissions() {
         val needed = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.NEARBY_WIFI_DEVICES)
@@ -135,8 +198,31 @@ class MainActivity : AppCompatActivity() {
                 needed += Manifest.permission.ACCESS_FINE_LOCATION
             }
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                needed += Manifest.permission.BLUETOOTH_CONNECT
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                needed += Manifest.permission.BLUETOOTH_SCAN
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                needed += Manifest.permission.BLUETOOTH_ADVERTISE
+            }
+        }
         if (needed.isNotEmpty()) {
             permissionLauncher.launch(needed.toTypedArray())
         }
+    }
+
+    companion object {
+        const val EXTRA_BLE_REGISTER = "ble_register"
+        const val EXTRA_BLE_HOST = "ble_host"
+        const val EXTRA_OPEN_TOUCHPAD = "open_touchpad"
     }
 }

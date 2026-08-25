@@ -12,17 +12,9 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/wifi_connection_title"
-            android:textAppearance="@style/TextAppearance.ArduHud.Title"
-            android:textSize="22sp" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="@color/metro_chrome"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -59,142 +51,307 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/wifiStatusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/wifi_status_disconnected"
-            android:textAppearance="@style/TextAppearance.ArduHud.Body"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/wifiCredsText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
-            android:textSize="14sp"
-            tools:text="SSID / pass / endpoint" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/wifi_test_hint"
-            android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
-            android:textSize="14sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/connectWifiButton"
-            style="@style/Widget.ArduHud.RectButton"
+        <LinearLayout
+            android:id="@+id/connectionTypeHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/wifi_connect" />
+            android:background="@color/metro_chrome"
+            android:clickable="true"
+            android:contentDescription="@string/connection_type_label"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="10dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/disconnectWifiButton"
-            style="@style/Widget.ArduHud.RectButton.Outlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/wifi_disconnect" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/usb_otg_title"
-            android:textAppearance="@style/TextAppearance.ArduHud.Title"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/usbStatusText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/usb_status_disconnected"
-            android:textAppearance="@style/TextAppearance.ArduHud.Body"
-            android:textSize="15sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="@string/usb_otg_hint"
-            android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
-            android:textSize="13sp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/connectUsbButton"
-            style="@style/Widget.ArduHud.RectButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/usb_otg_connect" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/disconnectUsbButton"
-            style="@style/Widget.ArduHud.RectButton.Outlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/usb_otg_disconnect" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/refreshUsbButton"
-            style="@style/Widget.ArduHud.RectButton.Text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/usb_otg_refresh" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sendPingButton"
-                style="@style/Widget.ArduHud.RectButton.Outlined"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/usb_send_ping" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/sendClickButton"
-                style="@style/Widget.ArduHud.RectButton.Outlined"
+            <TextView
+                android:id="@+id/connectionTypeHeaderText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/usb_send_click" />
+                android:text="@string/connection_type_label"
+                android:textColor="@color/metro_text"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/connectionTypeChevron"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no"
+                android:rotation="180"
+                android:src="@drawable/ic_expand_chevron" />
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.ArduHud.TextInputLayout"
+        <LinearLayout
+            android:id="@+id/connectionTypeList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/typeDirectBleButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/connection_type_direct_ble" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/typeWifiButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/connection_type_wifi" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/typeUsbButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/connection_type_usb" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/directBlePanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="@string/usb_custom_command_hint">
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/customCommandInput"
+            <TextView
+                android:id="@+id/directBleStatusText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@color/metro_text" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/direct_ble_status_idle"
+                android:textAppearance="@style/TextAppearance.ArduHud.Body"
+                android:textSize="15sp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/sendCustomCommandButton"
-            style="@style/Widget.ArduHud.RectButton.Text"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/direct_ble_hint"
+                android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/registerHidButton"
+                style="@style/Widget.ArduHud.RectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/direct_ble_register" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/connectHidPcButton"
+                style="@style/Widget.ArduHud.RectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/direct_ble_connect_pc" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/openTouchpadButton"
+                style="@style/Widget.ArduHud.RectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:enabled="false"
+                android:text="@string/direct_ble_open_touchpad" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/disconnectHidButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/direct_ble_disconnect" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/refreshBondedButton"
+                style="@style/Widget.ArduHud.RectButton.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/direct_ble_refresh" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/direct_ble_hosts_title"
+                android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+                android:textSize="13sp" />
+
+            <LinearLayout
+                android:id="@+id/bondedDevicesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wifiPanel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/usb_send_custom" />
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/wifiStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/wifi_status_disconnected"
+                android:textAppearance="@style/TextAppearance.ArduHud.Body"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/wifiCredsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+                android:textSize="14sp"
+                tools:text="SSID / pass / endpoint" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/wifi_test_hint"
+                android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/connectWifiButton"
+                style="@style/Widget.ArduHud.RectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/wifi_connect" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/disconnectWifiButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/wifi_disconnect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/usbPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/usbStatusText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/usb_status_disconnected"
+                android:textAppearance="@style/TextAppearance.ArduHud.Body"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/usb_otg_hint"
+                android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+                android:textSize="13sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/connectUsbButton"
+                style="@style/Widget.ArduHud.RectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/usb_otg_connect" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/disconnectUsbButton"
+                style="@style/Widget.ArduHud.RectButton.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/usb_otg_disconnect" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/refreshUsbButton"
+                style="@style/Widget.ArduHud.RectButton.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/usb_otg_refresh" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/espCommandPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sendPingButton"
+                    style="@style/Widget.ArduHud.RectButton.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/usb_send_ping" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sendClickButton"
+                    style="@style/Widget.ArduHud.RectButton.Outlined"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/usb_send_click" />
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.ArduHud.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/usb_custom_command_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/customCommandInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="@color/metro_text" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sendCustomCommandButton"
+                style="@style/Widget.ArduHud.RectButton.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/usb_send_custom" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"

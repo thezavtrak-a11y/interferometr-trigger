@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ArduHUD</string>
+    <string name="app_name">interferometr trigger</string>
 
     <string name="tab_sensor">Датчик</string>
     <string name="tab_wifi">Wi‑Fi</string>
@@ -15,7 +15,9 @@
 
     <string name="usb_status_disconnected">USB: ESP не подключена</string>
     <string name="connect_hid">Подключить HID</string>
+    <string name="connect_hid_nudge">Проверка курсора</string>
     <string name="forget_device">Забыть</string>
+    <string name="direct_ble_forget_blocked">Сначала отключите HID — нельзя забыть ПК во время сессии</string>
     <string name="usb_status_permission">USB: запрос доступа…</string>
     <string name="usb_status_connecting">USB: подключение…</string>
     <string name="usb_status_connected">USB: подключено (%1$s)</string>
@@ -70,14 +72,36 @@
     <string name="keep_screen_on_hint">По умолчанию выкл. Автовыкл. при ≤10% заряда — снова только вручную</string>
     <string name="keep_screen_on_auto_off">Экран: автовыкл. (заряд ≤10%)</string>
 
+    <string name="connection_type_label">Тип связи</string>
+    <string name="connection_type_direct_ble">BT HID напрямую к ПК</string>
+    <string name="connection_type_wifi">Wi‑Fi SoftAP → ESP</string>
+    <string name="connection_type_usb">USB OTG</string>
+
     <string name="wifi_connection_title">Связь телефон ↔ ESP (Wi‑Fi SoftAP)</string>
     <string name="wifi_creds">SSID: %1$s\nПароль: %2$s\nTCP: %3$s</string>
     <string name="wifi_connect">Подключить Wi‑Fi + TCP</string>
     <string name="wifi_disconnect">Отключить</string>
-    <string name="wifi_test_hint">1) Прошивка: esp32_c3_round_pen_link или esp32_c3_hud_link.\n2) Wi‑Fi: «Подключить Wi‑Fi + TCP» → сеть ArduHUD-ESP.\n3) Или USB OTG: кабель + «Подключить USB_OTG_COM».\n4) PING → PONG. Один протокол на оба канала (arduino/PROTOCOL.md).</string>
+    <string name="wifi_test_hint">Прошивка: esp32_c3_round_pen_link или esp32_c3_hud_link. «Подключить Wi‑Fi + TCP» → сеть ArduHUD-ESP. PING → PONG.</string>
+
+    <string name="direct_ble_title">BT HID напрямую к ПК (без ESP)</string>
+    <string name="direct_ble_hint">Телефон — Bluetooth-мышь для ПК, без ESP. «Зарегистрировать HID», на Windows: Добавить устройство → ArduHUD Mouse. Затем «Подключить к ПК» и тачпад.</string>
+    <string name="direct_ble_register">Зарегистрировать HID</string>
+    <string name="direct_ble_connect_pc">Подключить к ПК</string>
+    <string name="direct_ble_open_touchpad">Открыть тачпад (мышь)</string>
+    <string name="direct_ble_disconnect">Отключить BT HID</string>
+    <string name="direct_ble_refresh">Обновить сопряжённые</string>
+    <string name="direct_ble_status_idle">BT HID: не зарегистрирован</string>
+    <string name="direct_ble_status_registering">BT HID: регистрация…</string>
+    <string name="direct_ble_status_registered">BT HID: готов — Windows: Добавить устройство → Bluetooth → ArduHUD Mouse</string>
+    <string name="direct_ble_status_connecting">BT HID: подключение к %1$s…</string>
+    <string name="direct_ble_status_connected">BT HID: подключено к %1$s</string>
+    <string name="direct_ble_wait_host">HID зарегистрирован, имя «ArduHUD Mouse». Windows: Добавить устройство → Bluetooth → ArduHUD Mouse. Телефон сам стучится к ПК.</string>
+    <string name="direct_ble_register_failed">Не удалось зарегистрировать HID — проверьте Bluetooth и что профиль HID Device есть на телефоне</string>
+    <string name="direct_ble_bonded_empty">ПК не в списке сопряжённых — это нормально. Нажмите «Подключить к ПК» или на Windows: Добавить устройство → ArduHUD Mouse</string>
+    <string name="direct_ble_hosts_title">Хост ПК (последний / сопряжённые)</string>
 
     <string name="usb_otg_title">USB OTG COM</string>
-    <string name="usb_otg_hint">ESP32-C3 CDC @ 115200 через OTG. Тот же line-протокол, что и Wi‑Fi. Wi‑Fi и USB взаимоисключающи.</string>
+    <string name="usb_otg_hint">ESP32-C3 CDC @ 115200 через OTG. Кабель + «Подключить USB_OTG_COM». PING → PONG.</string>
     <string name="usb_otg_connect">Подключить USB_OTG_COM</string>
     <string name="usb_otg_disconnect">Отключить USB</string>
     <string name="usb_otg_refresh">Обновить список USB</string>
@@ -95,7 +119,7 @@
     <string name="log_empty">Журнал пуст</string>
 
     <string name="touchpad_hint">1 палец — движение\nТап — левый клик\nУдержание — правый клик\n2 пальца вверх/вниз — прокрутка\n2 пальца влево/вправо — кнопки 4 и 5\n\nНа круглом ESP:\nТап — клик (+ вспышка)\nТройной тап — PAD ON/OFF (фиолетовый)\nСвайп — движение (когда PAD ON)\nМолния — клики с телефона</string>
-    <string name="touchpad_not_connected">Сначала подключите ESP на вкладке Wi‑Fi</string>
+    <string name="touchpad_not_connected">Сначала подключите ESP (Wi‑Fi/USB) или BT HID к ПК</string>
     <string name="touchpad_find_pos">Найти</string>
     <string name="touchpad_remember_pos">Запомнить</string>
     <string name="touchpad_pos_none">«Найти» → ведите → «Запомнить». Win: выкл. «Повыш. точность указателя»</string>
@@ -106,10 +130,10 @@
     <string name="touchpad_pos_remembered">Путь MOVE запомнен (replay 1:1)</string>
     <string name="touchpad_pos_need_find">Сначала «Найти», затем движение</string>
 
-    <string name="link_fg_channel">Связь с ESP</string>
-    <string name="link_fg_channel_desc">Фоновая работа SoftAP/TCP и кликов</string>
-    <string name="link_fg_title">ArduHUD</string>
-    <string name="link_fg_text">Связь с ESP активна в фоне</string>
+    <string name="link_fg_channel">Связь</string>
+    <string name="link_fg_channel_desc">Фоновая работа связи с ПК и кликов</string>
+    <string name="link_fg_title">interferometr trigger</string>
+    <string name="link_fg_text">Связь с ПК активна в фоне</string>
     <string name="link_fg_text_armed">Клики с датчика — фоновый режим</string>
     <string name="link_fg_stop">Отключить</string>
 

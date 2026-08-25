@@ -17,8 +17,8 @@ import com.example.arduhud.MainActivity
 import com.example.arduhud.R
 
 /**
- * Keeps SoftAP/TCP + motion sensors alive while the UI is backgrounded.
- * Started whenever the ESP link is connected.
+ * Keeps the ESP TCP/USB link or phone-as-HID registration alive in the background.
+ * Started while an ESP link is connected, or while BT HID is registered and waiting for Windows.
  */
 class EspLinkForegroundService : Service() {
 
@@ -28,9 +28,12 @@ class EspLinkForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
-            stopCallback?.onStopRequested()
-            stopSelf()
-            return START_NOT_STICKY
+            val keepRunning = stopCallback?.onStopRequested() == true
+            if (!keepRunning) {
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            return START_STICKY
         }
         ensureChannel()
         val notification = buildNotification(
@@ -114,7 +117,8 @@ class EspLinkForegroundService : Service() {
     }
 
     fun interface StopCallback {
-        fun onStopRequested()
+        /** @return true to keep the foreground service (HID session still live). */
+        fun onStopRequested(): Boolean
     }
 
     companion object {

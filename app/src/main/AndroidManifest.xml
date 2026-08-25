@@ -18,9 +18,30 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- Phone-as-HID (Air Mouse path): BluetoothHidDevice → Windows host -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:minSdkVersion="31" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        android:minSdkVersion="31" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        android:minSdkVersion="31" />
+
     <uses-feature
         android:name="android.hardware.wifi"
         android:required="true" />
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="false" />
@@ -37,6 +58,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:screenOrientation="unspecified"
             android:windowSoftInputMode="adjustResize">

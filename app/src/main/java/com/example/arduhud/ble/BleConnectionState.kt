@@ -16,3 +16,10 @@ enum class MouseButton(val mask: Byte) {
     BUTTON4(0x08),
     BUTTON5(0x10),
 }
+
+data class HidBondedHost(
+    val name: String,
+    val address: String,
+    /** Major class COMPUTER — prefer as HID host over mice/headphones. */
+    val likelyHost: Boolean = false,
+)

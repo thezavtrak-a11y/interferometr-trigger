@@ -10,8 +10,11 @@ local.properties
 .externalNativeBuild
 .cxx
 *.apk
+!/interferometr-trigger.apk
 *.aab
 *.mp4
 *.log
 .DS_Store
 cursor_chat_*.json
+uidump.xml
+arduhud-screen.png

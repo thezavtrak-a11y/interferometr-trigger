@@ -146,7 +146,7 @@ class MainFragment : Fragment() {
             stopStatusBlink()
             viewModel.connectWifi()
         }
-        mouseButton.setOnClickListener { openTouchpad() }
+        mouseButton.setOnClickListener { showTouchpad() }
         channelsButton.setOnClickListener { toggleChannelsPanel() }
         timingButton.setOnClickListener { toggleTimingPanel() }
         orientationButton.setOnClickListener { toggleOrientation() }
@@ -749,7 +749,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun openTouchpad() {
+    fun showTouchpad() {
         if (childFragmentManager.findFragmentByTag(TOUCHPAD_TAG) == null) {
             childFragmentManager.beginTransaction()
                 .replace(R.id.touchpadContainer, TouchpadFragment(), TOUCHPAD_TAG)

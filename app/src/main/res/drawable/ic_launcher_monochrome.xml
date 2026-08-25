@@ -4,18 +4,15 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Classic mouse pointer (safe zone ~18–90). Tip at left-center. -->
     <path
         android:fillColor="#FFFFFFFF"
         android:pathData="M30,26 L30,78 L43,65 L54,88 L63,83 L52,60 L72,60 Z" />
-    <!-- Laser from the tip -->
     <path
         android:fillColor="#00000000"
         android:pathData="M32,28 L86,44"
         android:strokeWidth="2.5"
         android:strokeColor="#FFFFFFFF"
         android:strokeLineCap="square" />
-    <!-- Interferometer fringe ticks at the beam end -->
     <path
         android:fillColor="#00000000"
         android:pathData="M74,36 L84,40"
