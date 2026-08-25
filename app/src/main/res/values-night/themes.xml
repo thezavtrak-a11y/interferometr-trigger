@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.MyApplication" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/metro_accent</item>
+        <item name="colorOnPrimary">@color/metro_text</item>
+        <item name="colorSecondary">@color/metro_accent</item>
+        <item name="colorOnSecondary">@color/metro_text</item>
+        <item name="colorSurface">@color/metro_chrome</item>
+        <item name="colorOnSurface">@color/metro_text</item>
+        <item name="android:statusBarColor">@color/metro_bg</item>
+        <item name="android:navigationBarColor">@color/metro_bg</item>
+        <item name="android:windowBackground">@color/metro_bg</item>
+        <item name="materialButtonStyle">@style/Widget.ArduHud.RectButton</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.ArduHud.RectButton.Outlined</item>
+        <item name="textInputStyle">@style/Widget.ArduHud.TextInputLayout</item>
+    </style>
+</resources>

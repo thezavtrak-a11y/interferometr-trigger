@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Metro: square timer + hand -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,4h16v2H4z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,18h16v2H4z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M4,4h2v16H4z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18,4h2v16h-2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M10,2h4v3h-4z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,8h2v6h-2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11,12h5v2h-5z" />
+</vector>

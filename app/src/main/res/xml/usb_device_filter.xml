@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Espressif USB Serial/JTAG (ESP32-C3 CDC), common clones -->
+    <usb-device vendor-id="12346" />
+    <usb-device vendor-id="4292" />
+    <usb-device vendor-id="1027" />
+</resources>

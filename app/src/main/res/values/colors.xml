@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Windows Phone 10 / Metro reference -->
+    <color name="metro_bg">#FF000000</color>
+    <color name="metro_chrome">#FF1F1F1F</color>
+    <color name="metro_chrome_raised">#FF2B2B2B</color>
+    <color name="metro_accent">#FF00ADEF</color>
+    <color name="metro_accent_pressed">#FF0094CC</color>
+    <color name="metro_text">#FFFFFFFF</color>
+    <color name="metro_text_secondary">#FFA6A6A6</color>
+    <color name="metro_stroke">#FF3C3C3C</color>
+</resources>

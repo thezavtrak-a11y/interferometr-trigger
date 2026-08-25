@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/metro_bg"
+    tools:context=".ui.TouchpadFragment">
+
+    <View
+        android:id="@+id/touchpadSurface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/touchpad_background" />
+
+    <TextView
+        android:id="@+id/touchpadHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="@string/touchpad_hint"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="@color/metro_chrome"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/findPosButton"
+            style="@style/Widget.ArduHud.RectButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="@string/touchpad_find_pos" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/rememberPosButton"
+            style="@style/Widget.ArduHud.RectButton.Outlined"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/touchpad_remember_pos" />
+
+        <ImageButton
+            android:id="@+id/touchpadCloseButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/metro_chrome_raised"
+            android:contentDescription="@string/touchpad_close"
+            android:src="@drawable/ic_close"
+            android:tint="@color/metro_text" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/rememberedPosLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="72dp"
+        android:background="@color/metro_chrome"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="@string/touchpad_pos_none"
+        android:textAppearance="@style/TextAppearance.ArduHud.Caption"
+        android:textSize="12sp" />
+
+</FrameLayout>

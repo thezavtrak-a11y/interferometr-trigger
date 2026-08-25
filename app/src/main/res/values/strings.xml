@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">ArduHUD</string>
+
+    <string name="tab_sensor">Датчик</string>
+    <string name="tab_wifi">Wi‑Fi</string>
+    <string name="tab_usb">USB тест</string>
+    <string name="tab_bluetooth">Bluetooth</string>
+    <string name="tab_mouse">Мышь</string>
+
+    <string name="ble_disconnected">Wi‑Fi: ESP не подключена</string>
+    <string name="wifi_status_disconnected">Wi‑Fi: ESP не подключена</string>
+    <string name="wifi_status_permission">Wi‑Fi: нужно разрешение…</string>
+    <string name="wifi_status_connecting">Wi‑Fi: подключение к SoftAP…</string>
+    <string name="wifi_status_connected">Wi‑Fi: %1$s</string>
+
+    <string name="usb_status_disconnected">USB: ESP не подключена</string>
+    <string name="connect_hid">Подключить HID</string>
+    <string name="forget_device">Забыть</string>
+    <string name="usb_status_permission">USB: запрос доступа…</string>
+    <string name="usb_status_connecting">USB: подключение…</string>
+    <string name="usb_status_connected">USB: подключено (%1$s)</string>
+
+    <string name="activity_value_default">Активность: 0.00</string>
+    <string name="activity_value_channels">Активность: %1$.2f [%2$s] · %3$s</string>
+    <string name="detect_mode_sum">детект: сумма</string>
+    <string name="detect_mode_max">детект: максимум</string>
+    <string name="channel_sum">Σ сумма</string>
+    <string name="wave_smooth_label">Сглаживание (осц.+детект): %1$d мс</string>
+    <string name="wave_smooth_label_off">Сглаживание (осц.+детект): выкл</string>
+    <string name="channel_off">off</string>
+    <string name="accel_row_label">Акселерометр</string>
+    <string name="gyro_row_label">Гироскоп</string>
+    <string name="gate_on">ON</string>
+    <string name="gate_off">OFF</string>
+    <string name="motion_gate_label">Мин. движение: %1$.1f с</string>
+    <string name="motion_gate_label_off">Мин. движение: 0.0 с (выкл)</string>
+    <string name="rest_gate_label">Мин. покой: %1$.1f с</string>
+    <string name="rest_gate_label_off">Мин. покой: 0.0 с (выкл)</string>
+    <string name="gate_scale_0_1">0.1 с</string>
+    <string name="gate_scale_0_5">0.5 с</string>
+    <string name="gate_scale_2">2 с</string>
+    <string name="gate_scale_5">5 с</string>
+    <string name="gate_scale_10">10 с</string>
+    <string name="channels_button">Каналы</string>
+    <string name="scale_button">Масштаб</string>
+    <string name="timing_button">Тайминги детекта</string>
+    <string name="waveform_pause">Пауза</string>
+    <string name="waveform_resume">Снять</string>
+    <string name="waveform_pause_hint">Осциллограмма обновляется</string>
+    <string name="waveform_paused_hint">Осциллограмма на паузе</string>
+    <string name="orientation_button">Пейзаж / портрет</string>
+    <string name="settings_button">Настройки</string>
+    <string name="mouse_button">Тачпад</string>
+    <string name="click_arm_button">Отправка клика</string>
+    <string name="scale_panel_title">Масштаб</string>
+    <string name="y_zoom_autoscale">Y: автомасштаб (макс. отдаление)</string>
+    <string name="y_zoom_manual">Y: диапазон %1$.1f</string>
+    <string name="window_2s">2 с</string>
+    <string name="window_5s">5 с</string>
+    <string name="window_10s">10 с</string>
+    <string name="window_20s">20 с</string>
+    <string name="window_40s">40 с</string>
+    <string name="window_60s">60 с</string>
+    <string name="window_120s">120 с</string>
+    <string name="touchpad_close">Закрыть тачпад</string>
+    <string name="state_rest">Состояние: покой</string>
+    <string name="state_moving">Состояние: движение</string>
+
+    <string name="keep_screen_on_title">Не выключать экран</string>
+    <string name="keep_screen_on_hint">По умолчанию выкл. Автовыкл. при ≤10% заряда — снова только вручную</string>
+    <string name="keep_screen_on_auto_off">Экран: автовыкл. (заряд ≤10%)</string>
+
+    <string name="wifi_connection_title">Связь телефон ↔ ESP (Wi‑Fi SoftAP)</string>
+    <string name="wifi_creds">SSID: %1$s\nПароль: %2$s\nTCP: %3$s</string>
+    <string name="wifi_connect">Подключить Wi‑Fi + TCP</string>
+    <string name="wifi_disconnect">Отключить</string>
+    <string name="wifi_test_hint">1) Прошивка: esp32_c3_round_pen_link или esp32_c3_hud_link.\n2) Wi‑Fi: «Подключить Wi‑Fi + TCP» → сеть ArduHUD-ESP.\n3) Или USB OTG: кабель + «Подключить USB_OTG_COM».\n4) PING → PONG. Один протокол на оба канала (arduino/PROTOCOL.md).</string>
+
+    <string name="usb_otg_title">USB OTG COM</string>
+    <string name="usb_otg_hint">ESP32-C3 CDC @ 115200 через OTG. Тот же line-протокол, что и Wi‑Fi. Wi‑Fi и USB взаимоисключающи.</string>
+    <string name="usb_otg_connect">Подключить USB_OTG_COM</string>
+    <string name="usb_otg_disconnect">Отключить USB</string>
+    <string name="usb_otg_refresh">Обновить список USB</string>
+    <string name="usb_send_ping">Отправить PING</string>
+    <string name="usb_send_click">Отправить CLICK</string>
+    <string name="usb_custom_command_hint">Команда (например HELLO)</string>
+    <string name="usb_send_custom">Отправить команду</string>
+    <string name="link_send_failed">Не удалось отправить — нет соединения</string>
+    <string name="link_custom_command_empty">Введите команду</string>
+
+    <string name="debug_log_title">Журнал связи (отладка)</string>
+    <string name="clear_log">Очистить журнал</string>
+    <string name="copy_log">Копировать журнал</string>
+    <string name="log_copied">Журнал скопирован</string>
+    <string name="log_empty">Журнал пуст</string>
+
+    <string name="touchpad_hint">1 палец — движение\nТап — левый клик\nУдержание — правый клик\n2 пальца вверх/вниз — прокрутка\n2 пальца влево/вправо — кнопки 4 и 5\n\nНа круглом ESP:\nТап — клик (+ вспышка)\nТройной тап — PAD ON/OFF (фиолетовый)\nСвайп — движение (когда PAD ON)\nМолния — клики с телефона</string>
+    <string name="touchpad_not_connected">Сначала подключите ESP на вкладке Wi‑Fi</string>
+    <string name="touchpad_find_pos">Найти</string>
+    <string name="touchpad_remember_pos">Запомнить</string>
+    <string name="touchpad_pos_none">«Найти» → ведите → «Запомнить». Win: выкл. «Повыш. точность указателя»</string>
+    <string name="touchpad_pos_tracking">Пишем путь ΣMOVE: %1$d, %2$d</string>
+    <string name="touchpad_pos_saved">Запомнено Σ: %1$d, %2$d · сейчас %3$d, %4$d</string>
+    <string name="touchpad_pos_finding">Упираем курсор в правый верхний угол…</string>
+    <string name="touchpad_pos_found">Угол найден — двигайте, потом «Запомнить»</string>
+    <string name="touchpad_pos_remembered">Путь MOVE запомнен (replay 1:1)</string>
+    <string name="touchpad_pos_need_find">Сначала «Найти», затем движение</string>
+
+    <string name="link_fg_channel">Связь с ESP</string>
+    <string name="link_fg_channel_desc">Фоновая работа SoftAP/TCP и кликов</string>
+    <string name="link_fg_title">ArduHUD</string>
+    <string name="link_fg_text">Связь с ESP активна в фоне</string>
+    <string name="link_fg_text_armed">Клики с датчика — фоновый режим</string>
+    <string name="link_fg_stop">Отключить</string>
+
+    <string name="click_stats_button">Статистика кликов</string>
+    <string name="click_stats_title">Статистика кликов</string>
+    <string name="click_stats_clear">Очистить</string>
+    <string name="click_stats_status_recording">Запись: молния ON · время от вооружения</string>
+    <string name="click_stats_status_idle">Журнал сессии · нажмите молнию для новой записи</string>
+    <string name="click_stats_journal_title">Журнал</string>
+    <string name="click_stats_journal_empty">Пока пусто — вооружите молнию и сделайте жесты.</string>
+    <string name="click_stats_line_click">%1$s с  клик %2$s  %3$s</string>
+    <string name="click_stats_line_flip">%1$s с  ↔ направление  %2$s → %3$s</string>
+    <string name="click_stats_summary_title">Итог после отжатия молнии</string>
+    <string name="click_stats_summary_empty">Сводка появится после отжатия молнии.</string>
+    <string name="click_stats_summary_head">Сессия %1$.1f с · кликов %2$d · смен направления %3$d</string>
+    <string name="click_stats_summary_no_dirs">Нет кликов по направлениям.</string>
+    <string name="click_stats_summary_dir">%1$s · n=%2$d · avg %3$s · min %4$s · max %5$s</string>
+</resources>

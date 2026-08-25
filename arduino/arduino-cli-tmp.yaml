@@ -1,0 +1,16 @@
+board_manager:
+  additional_urls: []
+daemon:
+  port: "50051"
+directories:
+  data: C:\Users\zavtr\AppData\Local\Arduino15
+  downloads: C:\Users\zavtr\AppData\Local\Arduino15\staging
+  user: C:\Users\zavtr\Documents\Arduino
+library:
+  enable_unsafe_install: false
+logging:
+  file: ""
+  format: text
+  level: info
+sketch:
+  always_export_binaries: false

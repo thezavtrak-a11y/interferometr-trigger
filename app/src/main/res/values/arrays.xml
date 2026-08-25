@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sensor_axis_labels">
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
+        <item>Magnitude</item>
+    </string-array>
+</resources>

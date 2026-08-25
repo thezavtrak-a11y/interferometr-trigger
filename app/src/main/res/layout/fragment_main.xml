@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainFragment">
+
+    <com.example.arduhud.ui.MotionWaveformView
+        android:id="@+id/motionWaveform"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/sensorOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/metro_chrome"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="2dp"
+            android:paddingBottom="4dp">
+
+            <FrameLayout
+                android:id="@+id/wifiConnectButton"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/bg_metro_icon_button"
+                android:clickable="true"
+                android:contentDescription="@string/wifi_connect"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless">
+
+                <View
+                    android:id="@+id/bleStatusDot"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/status_dot_disconnected" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/toolbarStatusText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:minWidth="24dp"
+                android:textColor="@android:color/white"
+                android:textSize="11sp" />
+
+            <ImageButton
+                android:id="@+id/pauseButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/waveform_pause"
+                android:src="@drawable/ic_pause" />
+
+            <ImageButton
+                android:id="@+id/clickArmButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/click_arm_button"
+                android:src="@drawable/ic_click_arm" />
+
+            <ImageButton
+                android:id="@+id/channelsButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/channels_button"
+                android:src="@drawable/ic_channels" />
+
+            <ImageButton
+                android:id="@+id/timingButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/timing_button"
+                android:src="@drawable/ic_timer" />
+
+            <ImageButton
+                android:id="@+id/mouseButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/mouse_button"
+                android:src="@drawable/ic_mouse" />
+
+            <ImageButton
+                android:id="@+id/orientationButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/orientation_button"
+                android:src="@drawable/ic_screen_rotate" />
+
+            <ImageButton
+                android:id="@+id/statsButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/click_stats_button"
+                android:src="@drawable/ic_stats" />
+
+            <ImageButton
+                android:id="@+id/settingsButton"
+                style="@style/Widget.ArduHud.ToolbarIcon"
+                android:contentDescription="@string/settings_button"
+                android:src="@drawable/ic_settings" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/channelsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/metro_chrome"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/accel_row_label"
+                android:textColor="@color/metro_text_secondary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/accelChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleSelection="false" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/gyro_row_label"
+                android:textColor="@color/metro_text_secondary"
+                android:textSize="12sp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/gyroChipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleSelection="false" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/sumChip"
+                style="@style/Widget.ArduHud.RectFilterChip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:checkable="true"
+                android:text="@string/channel_sum"
+                android:textColor="#FFFFFF" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/smoothMinusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="−" />
+
+                <com.example.arduhud.ui.TdSliderView
+                    android:id="@+id/waveSmoothSeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/smoothPlusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="+" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/timingPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/metro_chrome"
+            android:orientation="vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:id="@+id/motionScaleRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/motionScale01Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_0_1"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/motionScale05Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_0_5"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/motionScale5Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_5"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/motionMinusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="−" />
+
+                <com.example.arduhud.ui.TdSliderView
+                    android:id="@+id/motionGateSeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/motionPlusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="+" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/restScaleRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="8dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/restScale05Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_0_5"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/restScale2Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_2"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/restScale10Button"
+                    style="@style/Widget.ArduHud.RectToggleButton"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/gate_scale_10"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/restMinusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="−" />
+
+                <com.example.arduhud.ui.TdSliderView
+                    android:id="@+id/restGateSeekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/restPlusButton"
+                    style="@style/Widget.ArduHud.RectButton.Nudge"
+                    android:layout_width="48dp"
+                    android:layout_height="40dp"
+                    android:text="+" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/activityValueText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/metro_chrome"
+            android:padding="8dp"
+            android:text="@string/activity_value_default"
+            android:textAppearance="@style/TextAppearance.ArduHud.Body"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/motionStateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/metro_chrome"
+            android:padding="8dp"
+            android:text="@string/state_rest"
+            android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/touchpadContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/clickFlashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="#CCFFFFFF"
+        android:visibility="gone" />
+
+</FrameLayout>

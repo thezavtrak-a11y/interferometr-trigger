@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Metro: zoom / scale brackets -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,3h7v2H5v5H3z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M14,3h7v7h-2V5h-5z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,14h2v5h5v2H3z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M19,14h2v7h-7v-2h5z" />
+</vector>
