@@ -194,6 +194,9 @@ class ConnectionFragment : Fragment() {
         view.findViewById<MaterialButton>(R.id.clearLogButton).setOnClickListener {
             viewModel.clearLinkLog()
         }
+        view.findViewById<MaterialButton>(R.id.showTutorialButton).setOnClickListener {
+            (activity as? MainActivity)?.startTutorial()
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -287,6 +290,7 @@ class ConnectionFragment : Fragment() {
     private fun pickConnectionType(type: LinkTransport) {
         selectedType = type
         typeListExpanded = false
+        viewModel.setPreferredTransport(type)
         applyTypePickerUi()
     }
 
@@ -481,6 +485,18 @@ class ConnectionFragment : Fragment() {
 
     private fun showMessage(message: String) {
         view?.let { Snackbar.make(it, message, Snackbar.LENGTH_SHORT).show() }
+    }
+
+    fun prepareTutorialStep(targetId: Int) {
+        if (targetId == R.id.connectionTypeHeader) {
+            typeListExpanded = true
+            applyTypePickerUi()
+        }
+        val scroll = view as? android.widget.ScrollView ?: return
+        val target = view?.findViewById<View>(targetId) ?: return
+        scroll.post {
+            scroll.scrollTo(0, target.top)
+        }
     }
 
     companion object {

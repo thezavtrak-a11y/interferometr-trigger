@@ -2,6 +2,7 @@ package com.example.arduhud
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,12 +49,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val usbLink = EspUsbSerialManager(application)
     private val bleHid = BleHidManager.get(application)
     private val clickStats = ClickStatsRecorder()
+    private val appPrefs = application.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     val motionData: StateFlow<MotionData> = sensorProcessor.motionData
     val clickEvents: SharedFlow<ClickPulse> = sensorProcessor.clickEvents
 
     private val _activeTransport = MutableStateFlow(LinkTransport.None)
     val activeTransport: StateFlow<LinkTransport> = _activeTransport.asStateFlow()
+    private var preferredTransport: LinkTransport = loadPreferredTransport()
 
     private val _connectionState = MutableStateFlow<EspLinkState>(EspLinkState.Disconnected)
     val connectionState: StateFlow<EspLinkState> = _connectionState.asStateFlow()
@@ -90,6 +93,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private var clickOutputEnabled = false
     /** True while MainFragment is resumed — waveform UI wants sensors even offline. */
     private var uiForeground = false
+    private var tutorialDemoActive = false
+    private var tutorialFlashEnabled = false
 
     private val _keepScreenOn = MutableStateFlow(false)
     val keepScreenOn: StateFlow<Boolean> = _keepScreenOn.asStateFlow()
@@ -139,6 +144,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         viewModelScope.launch {
             clickEvents.collect { pulse ->
+                if (tutorialDemoActive) return@collect
                 if (!clickOutputEnabled) return@collect
                 clickStats.onClick(pulse)
                 _clickJournal.value = clickStats.journal
@@ -552,9 +558,74 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun setDetectPaused(paused: Boolean) = sensorProcessor.setDetectPaused(paused)
     fun isDetectPaused(): Boolean = sensorProcessor.isDetectPaused()
 
+    fun setTutorialDemo(active: Boolean) {
+        if (!active) tutorialFlashEnabled = false
+        if (tutorialDemoActive == active) return
+        tutorialDemoActive = active
+        if (active) {
+            startSensors()
+            sensorProcessor.startTutorialDemo()
+        } else {
+            sensorProcessor.stopTutorialDemo()
+        }
+    }
+
+    fun isTutorialDemo(): Boolean = tutorialDemoActive
+
+    fun setTutorialFlashEnabled(enabled: Boolean) {
+        tutorialFlashEnabled = enabled
+    }
+
+    fun isTutorialFlashEnabled(): Boolean = tutorialFlashEnabled
+
+    fun setPreferredTransport(type: LinkTransport) {
+        if (type == LinkTransport.None) return
+        preferredTransport = type
+        appPrefs.edit().putString(PREF_TRANSPORT, type.name).apply()
+    }
+
+    private fun loadPreferredTransport(): LinkTransport {
+        val name = appPrefs.getString(PREF_TRANSPORT, null) ?: return LinkTransport.None
+        return runCatching { LinkTransport.valueOf(name) }.getOrNull()
+            ?.takeIf { it != LinkTransport.None }
+            ?: LinkTransport.None
+    }
+
+    fun resolvedPreferredTransport(): LinkTransport {
+        if (preferredTransport != LinkTransport.None) return preferredTransport
+        if (_activeTransport.value != LinkTransport.None) return _activeTransport.value
+        return LinkTransport.DirectBle
+    }
+
+    fun isAnyLinkActive(): Boolean {
+        val ble = _bleUiState.value
+        val hidBusy = ble is BleConnectionState.Connected ||
+            ble is BleConnectionState.Connecting ||
+            ble is BleConnectionState.Registering ||
+            ble is BleConnectionState.Registered
+        val link = _connectionState.value
+        val espBusy = link is EspLinkState.Connected ||
+            link is EspLinkState.Connecting ||
+            link is EspLinkState.RequestingPermission
+        return hidBusy || espBusy || _activeTransport.value != LinkTransport.None
+    }
+
+    fun togglePreferredLink(hostActivity: Activity) {
+        if (isAnyLinkActive()) {
+            disconnectActiveLink()
+            return
+        }
+        when (resolvedPreferredTransport()) {
+            LinkTransport.Wifi -> connectWifi()
+            LinkTransport.Usb -> connectUsbOtg()
+            LinkTransport.DirectBle, LinkTransport.None -> registerDirectBle(hostActivity)
+        }
+    }
+
     fun connectWifi() {
         bleHid.disconnectHost()
         bleHid.unregister()
+        setPreferredTransport(LinkTransport.Wifi)
         _activeTransport.value = LinkTransport.Wifi
         usbLink.disconnect()
         wifiLink.connect()
@@ -563,6 +634,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun connectUsbOtg() {
         bleHid.disconnectHost()
         bleHid.unregister()
+        setPreferredTransport(LinkTransport.Usb)
         _activeTransport.value = LinkTransport.Usb
         wifiLink.disconnect()
         usbLink.connectFirstDevice()
@@ -576,6 +648,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     /** Register phone as Bluetooth HID mouse (Air Mouse path). Pair PC first in system BT. */
     fun registerDirectBle(hostActivity: Activity? = null): Boolean {
         _activeTransport.value = LinkTransport.DirectBle
+        setPreferredTransport(LinkTransport.DirectBle)
         _penControlEnabled.value = true
         wifiLink.disconnect()
         usbLink.disconnect()
@@ -585,6 +658,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun connectBleHost(address: String): Boolean {
         _activeTransport.value = LinkTransport.DirectBle
+        setPreferredTransport(LinkTransport.DirectBle)
         _penControlEnabled.value = true
         wifiLink.disconnect()
         usbLink.disconnect()
@@ -805,6 +879,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             bleHid.shutdown()
         }
         stopSensors()
+        sensorProcessor.stopTutorialDemo()
         wifiLink.shutdown()
         usbLink.shutdown()
         super.onCleared()
@@ -827,5 +902,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         private const val CORNER_SETTLE_MS = 200L
         const val WAVE_SMOOTH_MAX_SEC = 0.5f
         const val KEEP_SCREEN_OFF_BATTERY_PCT = 10
+        private const val PREFS = "arduhud_prefs"
+        private const val PREF_TRANSPORT = "preferred_transport"
     }
 }

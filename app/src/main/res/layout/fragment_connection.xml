@@ -13,6 +13,7 @@
         android:padding="16dp">
 
         <LinearLayout
+            android:id="@+id/keepScreenOnRow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/metro_chrome"
@@ -397,6 +398,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/clear_log" />
         </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/showTutorialButton"
+            style="@style/Widget.ArduHud.RectButton.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/show_tutorial" />
 
     </LinearLayout>
 </ScrollView>

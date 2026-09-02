@@ -22,6 +22,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
+import com.example.arduhud.tutorial.TutorialGuide
+import com.example.arduhud.tutorial.TutorialOverlayView
+import com.example.arduhud.tutorial.TutorialPrefs
+import com.example.arduhud.ui.MainFragment
 import com.example.arduhud.ui.MainPagerAdapter
 import kotlinx.coroutines.launch
 
@@ -29,9 +33,12 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: AppViewModel by viewModels()
     private lateinit var viewPager: ViewPager2
+    private var tutorialGuide: TutorialGuide? = null
+    private var skipFirstRunTutorial = false
 
     private val settingsBackCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
+            if (tutorialGuide?.isRunning == true) return
             openSensorScreen()
         }
     }
@@ -69,6 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         viewPager = findViewById(R.id.viewPager)
         viewPager.adapter = MainPagerAdapter(this)
+        viewPager.offscreenPageLimit = 2
         viewPager.isUserInputEnabled = false
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -88,7 +96,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val overlay = findViewById<TutorialOverlayView>(R.id.tutorialOverlay)
+        tutorialGuide = TutorialGuide(this, overlay, viewModel)
+
         handleBleDebugIntent(intent)
+        maybeStartFirstRunTutorial()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -107,6 +119,7 @@ class MainActivity : AppCompatActivity() {
         val host = intent.getStringExtra(EXTRA_BLE_HOST)
         val openPad = intent.getBooleanExtra(EXTRA_OPEN_TOUCHPAD, false)
         if (!register && host.isNullOrBlank() && !openPad) return
+        skipFirstRunTutorial = true
         intent.removeExtra(EXTRA_BLE_REGISTER)
         intent.removeExtra(EXTRA_BLE_HOST)
         intent.removeExtra(EXTRA_OPEN_TOUCHPAD)
@@ -143,8 +156,8 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
     }
 
-    fun openSensorScreen() {
-        if (::viewPager.isInitialized) viewPager.setCurrentItem(0, false)
+    fun openSensorScreen(animated: Boolean = false) {
+        if (::viewPager.isInitialized) viewPager.setCurrentItem(0, animated)
     }
 
     fun openTouchpad() {
@@ -160,18 +173,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun findMainFragment(): com.example.arduhud.ui.MainFragment? {
+    fun findMainFragment(): MainFragment? {
         return supportFragmentManager.fragments
-            .filterIsInstance<com.example.arduhud.ui.MainFragment>()
+            .filterIsInstance<MainFragment>()
             .firstOrNull()
     }
 
-    fun openSettingsScreen() {
-        if (::viewPager.isInitialized) viewPager.setCurrentItem(1, false)
+    fun startTutorial() {
+        if (tutorialGuide?.isRunning == true) return
+        openSensorScreen()
+        viewPager.post {
+            viewPager.postDelayed({
+                if (isDestroyed || isFinishing) return@postDelayed
+                tutorialGuide?.start()
+            }, 120)
+        }
     }
 
-    fun openClickStatsScreen() {
-        if (::viewPager.isInitialized) viewPager.setCurrentItem(2, false)
+    private fun maybeStartFirstRunTutorial() {
+        if (skipFirstRunTutorial) return
+        if (TutorialPrefs.hasSeen(this)) return
+        viewPager.post {
+            viewPager.postDelayed({
+                if (isDestroyed || isFinishing) return@postDelayed
+                if (skipFirstRunTutorial || TutorialPrefs.hasSeen(this)) return@postDelayed
+                startTutorial()
+            }, 500)
+        }
+    }
+
+    fun openSettingsScreen(animated: Boolean = false) {
+        if (::viewPager.isInitialized) viewPager.setCurrentItem(1, animated)
+    }
+
+    fun openClickStatsScreen(animated: Boolean = false) {
+        if (::viewPager.isInitialized) viewPager.setCurrentItem(2, animated)
     }
 
     fun isSettingsScreen(): Boolean {

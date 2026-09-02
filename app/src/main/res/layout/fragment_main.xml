@@ -19,6 +19,7 @@
         android:padding="12dp">
 
         <LinearLayout
+            android:id="@+id/sensorToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/metro_chrome"
@@ -36,7 +37,7 @@
                 android:layout_marginEnd="2dp"
                 android:background="@drawable/bg_metro_icon_button"
                 android:clickable="true"
-                android:contentDescription="@string/wifi_connect"
+                android:contentDescription="@string/link_toggle"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless">
 
@@ -342,17 +343,6 @@
             android:text="@string/activity_value_default"
             android:textAppearance="@style/TextAppearance.ArduHud.Body"
             android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/motionStateText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@color/metro_chrome"
-            android:padding="8dp"
-            android:text="@string/state_rest"
-            android:textAppearance="@style/TextAppearance.ArduHud.Secondary"
-            android:textSize="13sp" />
     </LinearLayout>
 
     <FrameLayout

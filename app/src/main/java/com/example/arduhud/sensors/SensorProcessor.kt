@@ -5,6 +5,9 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import com.example.arduhud.stats.ClickPulse
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.abs
 import kotlin.math.exp
+import kotlin.math.sin
 import kotlin.math.sqrt
 
 class SensorProcessor(context: Context) : SensorEventListener {
@@ -63,6 +67,17 @@ class SensorProcessor(context: Context) : SensorEventListener {
     private var smoothTauSec = 0f
     private var lastEmaNs = 0L
     private val channelEma = HashMap<SensorChannel, Float>()
+
+    private var demoMode = false
+    private var demoStartMs = 0L
+    private val demoHandler = Handler(Looper.getMainLooper())
+    private val demoRunnable = object : Runnable {
+        override fun run() {
+            if (!demoMode) return
+            applyDemoSample()
+            demoHandler.postDelayed(this, DEMO_PERIOD_MS)
+        }
+    }
 
     fun setThreshold(newThreshold: Float) {
         threshold = newThreshold.coerceIn(MIN_THRESHOLD, MAX_THRESHOLD)
@@ -122,6 +137,63 @@ class SensorProcessor(context: Context) : SensorEventListener {
 
     fun isDetectPaused(): Boolean = detectPaused
 
+    fun startTutorialDemo() {
+        demoMode = true
+        isMoving = false
+        pendingRestDetect = false
+        restStartNs = 0L
+        motionStartNs = 0L
+        channelEma.clear()
+        lastEmaNs = 0L
+        lastClickTimeMs = 0L
+        demoStartMs = SystemClock.elapsedRealtime()
+        demoHandler.removeCallbacks(demoRunnable)
+        demoHandler.post(demoRunnable)
+    }
+
+    fun stopTutorialDemo() {
+        if (!demoMode) return
+        demoMode = false
+        demoHandler.removeCallbacks(demoRunnable)
+        linearX = 0f
+        linearY = 0f
+        linearZ = 0f
+        gyroX = 0f
+        gyroY = 0f
+        gyroZ = 0f
+        isMoving = false
+        pendingRestDetect = false
+        restStartNs = 0L
+        channelEma.clear()
+        lastEmaNs = 0L
+        updateMotionState()
+    }
+
+    private fun applyDemoSample() {
+        val t = (SystemClock.elapsedRealtime() - demoStartMs) / 1000f
+        val phase = t % DEMO_CYCLE_SEC
+        val bursting = phase >= DEMO_BURST_START && phase < DEMO_BURST_END
+        if (bursting) {
+            val u = (phase - DEMO_BURST_START) / (DEMO_BURST_END - DEMO_BURST_START)
+            val envelope = sin(u * Math.PI).toFloat()
+            linearX = 0.2f * envelope
+            linearY = 4.4f * envelope
+            linearZ = 0.3f * envelope
+            gyroX = 1.6f * envelope
+            gyroY = 0.4f * envelope
+            gyroZ = 0.2f * envelope
+        } else {
+            val n = 0.12f * sin((t * 9.0).toDouble()).toFloat()
+            linearX = n * 0.4f
+            linearY = n
+            linearZ = n * 0.2f
+            gyroX = n * 0.15f
+            gyroY = 0f
+            gyroZ = 0f
+        }
+        updateMotionState()
+    }
+
     fun start() {
         if (running) return
         running = true
@@ -140,6 +212,7 @@ class SensorProcessor(context: Context) : SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
+        if (demoMode) return
         if (event == null) return
 
         when (event.sensor.type) {
@@ -348,5 +421,10 @@ class SensorProcessor(context: Context) : SensorEventListener {
         const val DEFAULT_MIN_REST_SEC = 0.0f
         const val MIN_REST_SEC = 0.0f
         const val MAX_REST_SEC = 10.0f
+
+        private const val DEMO_PERIOD_MS = 20L
+        private const val DEMO_CYCLE_SEC = 2.6f
+        private const val DEMO_BURST_START = 0.7f
+        private const val DEMO_BURST_END = 1.25f
     }
 }

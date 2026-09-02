@@ -1,5 +1,7 @@
 package com.example.arduhud.ui
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.pm.ActivityInfo
@@ -7,6 +9,8 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -30,6 +34,8 @@ import com.example.arduhud.link.EspLinkState
 import com.example.arduhud.sensors.SensorChannel
 import com.example.arduhud.sensors.SensorProcessor
 import com.example.arduhud.sensors.TimeWindowSec
+import com.example.arduhud.tutorial.TutorialAnim
+import com.example.arduhud.tutorial.TutorialChrome
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -41,7 +47,6 @@ class MainFragment : Fragment() {
 
     private lateinit var waveformView: MotionWaveformView
     private lateinit var activityValueText: TextView
-    private lateinit var motionStateText: TextView
     private lateinit var toolbarStatusText: TextView
     private lateinit var usbStatusDot: View
     private lateinit var clickFlashOverlay: View
@@ -79,6 +84,10 @@ class MainFragment : Fragment() {
     private var pathReplaying = false
     private var motionScaleMaxSec = MOTION_SCALES.last()
     private var restScaleMaxSec = REST_SCALES.last()
+    private var tutorialAnimators = mutableListOf<ValueAnimator>()
+    private val tutorialHandler = Handler(Looper.getMainLooper())
+    private var tutorialAnimToken = 0
+    private var tutorialRestore: (() -> Unit)? = null
 
     private val accelOffChipId = View.generateViewId()
     private val gyroOffChipId = View.generateViewId()
@@ -102,7 +111,6 @@ class MainFragment : Fragment() {
 
         waveformView = view.findViewById(R.id.motionWaveform)
         activityValueText = view.findViewById(R.id.activityValueText)
-        motionStateText = view.findViewById(R.id.motionStateText)
         toolbarStatusText = view.findViewById(R.id.toolbarStatusText)
         usbStatusDot = view.findViewById(R.id.bleStatusDot)
         clickFlashOverlay = view.findViewById(R.id.clickFlashOverlay)
@@ -144,7 +152,7 @@ class MainFragment : Fragment() {
 
         view.findViewById<View>(R.id.wifiConnectButton).setOnClickListener {
             stopStatusBlink()
-            viewModel.connectWifi()
+            viewModel.togglePreferredLink(requireActivity())
         }
         mouseButton.setOnClickListener { showTouchpad() }
         channelsButton.setOnClickListener { toggleChannelsPanel() }
@@ -194,21 +202,15 @@ class MainFragment : Fragment() {
                             R.string.activity_value_channels,
                             data.activity,
                             formatChannels(data.enabledChannels),
-                            if (data.useSum) {
-                                getString(R.string.detect_mode_sum)
+                            if (data.isMoving) {
+                                getString(R.string.state_moving)
                             } else {
-                                getString(R.string.detect_mode_max)
+                                getString(R.string.state_rest)
                             },
                         )
-                        val stateText = if (data.isMoving) {
-                            getString(R.string.state_moving)
-                        } else {
-                            getString(R.string.state_rest)
-                        }
                         activityValueText.text = activityText
-                        motionStateText.text = stateText
                         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                            toolbarStatusText.text = "$activityText\n$stateText"
+                            toolbarStatusText.text = activityText
                         }
                     }
                 }
@@ -219,9 +221,12 @@ class MainFragment : Fragment() {
                 }
                 launch {
                     viewModel.clickEvents.collect {
-                        if (viewModel.isClickOutputEnabled()) {
-                            flashClick()
+                        val allowFlash = if (viewModel.isTutorialDemo()) {
+                            viewModel.isTutorialFlashEnabled()
+                        } else {
+                            viewModel.isClickOutputEnabled()
                         }
+                        if (allowFlash) flashClick()
                     }
                 }
                 launch {
@@ -743,11 +748,342 @@ class MainFragment : Fragment() {
     private fun applyOrientationLayout() {
         val landscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         activityValueText.isVisible = !landscape
-        motionStateText.isVisible = !landscape
         if (!landscape) {
             toolbarStatusText.text = ""
         }
     }
+
+    fun prepareTutorialWaveform() {
+        if (!::waveformView.isInitialized) return
+        if (waveformPaused) setWaveformPaused(false)
+        waveformView.clearSamples()
+    }
+
+    fun applyTutorialChrome(chrome: TutorialChrome) {
+        if (!::channelsPanel.isInitialized) return
+        when (chrome) {
+            TutorialChrome.None -> {
+                closeTouchpad()
+                channelsPanel.isVisible = false
+                timingPanel.isVisible = false
+            }
+            TutorialChrome.Channels -> {
+                closeTouchpad()
+                timingPanel.isVisible = false
+                channelsPanel.isVisible = true
+            }
+            TutorialChrome.Timing -> {
+                closeTouchpad()
+                channelsPanel.isVisible = false
+                timingPanel.isVisible = true
+            }
+            TutorialChrome.Touchpad -> {
+                channelsPanel.isVisible = false
+                timingPanel.isVisible = false
+                showTouchpad()
+            }
+        }
+        motionGateSeekBar.progress = motionSecToProgress(viewModel.getMinMotionSec())
+        restGateSeekBar.progress = restSecToProgress(viewModel.getMinRestSec())
+        updateMotionGateUi()
+        updateRestGateUi()
+        refreshTimingOverlay()
+        refreshToolbarHighlights()
+    }
+
+    fun cancelTutorialAutoplay() {
+        cancelTutorialAutoplay(restore = false)
+    }
+
+    private fun cancelTutorialAutoplay(restore: Boolean) {
+        tutorialAnimToken++
+        tutorialAnimators.forEach { it.cancel() }
+        tutorialAnimators.clear()
+        tutorialHandler.removeCallbacksAndMessages(null)
+        if (restore) {
+            tutorialRestore?.invoke()
+            tutorialRestore = null
+        }
+    }
+
+    fun stopTutorialAnimations() {
+        cancelTutorialAutoplay(restore = true)
+        if (::waveformView.isInitialized && waveformPaused) {
+            setWaveformPaused(false)
+        }
+        if (::waveformView.isInitialized) {
+            waveformView.setThreshold(viewModel.getThreshold())
+            waveformView.setTimeWindow(TimeWindowSec.S20)
+        }
+    }
+
+    fun playTutorialAnim(anim: TutorialAnim) {
+        cancelTutorialAutoplay(restore = true)
+        when (anim) {
+            TutorialAnim.None -> {
+                if (::waveformView.isInitialized && waveformPaused) {
+                    setWaveformPaused(false)
+                }
+            }
+            TutorialAnim.Threshold -> playThresholdTour()
+            TutorialAnim.Channels -> playChannelsTour()
+            TutorialAnim.Timing -> playTimingTour()
+        }
+    }
+
+    fun syncChannelUiFromViewModel() {
+        if (!::accelChipGroup.isInitialized) return
+        val enabled = viewModel.getEnabledChannels()
+        updatingChannelChips = true
+        syncChipGroup(accelChipGroup, accelOffChipId, enabled)
+        syncChipGroup(gyroChipGroup, gyroOffChipId, enabled)
+        updatingChannelChips = false
+        refreshAxisChipColors(accelChipGroup)
+        refreshAxisChipColors(gyroChipGroup)
+        if (sumChip.isChecked != viewModel.getUseSum()) {
+            sumChip.isChecked = viewModel.getUseSum()
+        }
+        waveformView.setEnabledChannels(enabled)
+        waveformView.setShowSum(viewModel.getUseSum())
+        applyWaveSmoothSec(viewModel.getWaveSmoothSec())
+        waveformView.setThreshold(viewModel.getThreshold())
+        motionGateSeekBar.progress = motionSecToProgress(viewModel.getMinMotionSec())
+        restGateSeekBar.progress = restSecToProgress(viewModel.getMinRestSec())
+        updateMotionGateUi()
+        updateRestGateUi()
+        refreshTimingOverlay()
+    }
+
+    private fun syncChipGroup(group: ChipGroup, offId: Int, enabled: Set<SensorChannel>) {
+        var any = false
+        for (i in 0 until group.childCount) {
+            val chip = group.getChildAt(i) as? Chip ?: continue
+            val tag = chip.tag
+            if (tag is SensorChannel) {
+                chip.isChecked = tag in enabled
+                if (chip.isChecked) any = true
+            }
+        }
+        group.findViewById<Chip>(offId)?.isChecked = !any
+    }
+
+    private fun playThresholdTour() {
+        val yMax = waveformView.visibleYMax().coerceAtLeast(1f)
+        val lo = (yMax * 0.18f).coerceAtLeast(SensorProcessor.MIN_THRESHOLD)
+        val hi = (yMax * 0.82f).coerceAtMost(SensorProcessor.MAX_THRESHOLD)
+        if (hi <= lo + 0.05f) return
+        tutorialRestore = { waveformView.setThreshold(viewModel.getThreshold()) }
+        val anim = ValueAnimator.ofFloat(lo, hi).apply {
+            duration = 1400L
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = LinearInterpolator()
+            addUpdateListener { waveformView.setThreshold(it.animatedValue as Float) }
+            start()
+        }
+        tutorialAnimators += anim
+    }
+
+    private fun playChannelsTour() {
+        val savedCh = viewModel.getEnabledChannels().toSet()
+        val savedSum = viewModel.getUseSum()
+        val savedSmooth = viewModel.getWaveSmoothSec()
+        tutorialRestore = {
+            viewModel.setEnabledChannels(savedCh)
+            viewModel.setUseSum(savedSum)
+            viewModel.setWaveSmoothSec(savedSmooth)
+            syncChannelUiFromViewModel()
+        }
+        val states = listOf(
+            ChannelTourState(setOf(SensorChannel.ACC_MAG, SensorChannel.GYRO_MAG), true),
+            ChannelTourState(setOf(SensorChannel.GYRO_MAG), false),
+            ChannelTourState(emptySet(), false),
+            ChannelTourState(setOf(SensorChannel.ACC_X), false),
+            ChannelTourState(setOf(SensorChannel.ACC_X, SensorChannel.ACC_Y), false),
+            ChannelTourState(setOf(SensorChannel.ACC_X, SensorChannel.ACC_Y, SensorChannel.ACC_Z), false),
+            ChannelTourState(setOf(SensorChannel.GYRO_X), false),
+            ChannelTourState(setOf(SensorChannel.GYRO_X, SensorChannel.GYRO_Y), false),
+            ChannelTourState(setOf(SensorChannel.GYRO_X, SensorChannel.GYRO_Y, SensorChannel.GYRO_Z), false),
+            ChannelTourState(setOf(SensorChannel.ACC_MAG, SensorChannel.GYRO_MAG), true),
+        )
+        applyWaveSmoothSec(0f)
+        val token = tutorialAnimToken
+        var step = 0
+        val tick = object : Runnable {
+            override fun run() {
+                if (token != tutorialAnimToken) return
+                if (step >= states.size) {
+                    playSmoothSweep(token) {
+                        step = 0
+                        tutorialHandler.post(this)
+                    }
+                    return
+                }
+                val state = states[step]
+                applyTutorialChannels(state.channels, state.useSum)
+                step++
+                tutorialHandler.postDelayed(this, 700L)
+            }
+        }
+        tutorialHandler.post(tick)
+    }
+
+    private fun applyTutorialChannels(channels: Set<SensorChannel>, useSum: Boolean) {
+        updatingChannelChips = true
+        syncChipGroup(accelChipGroup, accelOffChipId, channels)
+        syncChipGroup(gyroChipGroup, gyroOffChipId, channels)
+        updatingChannelChips = false
+        refreshAxisChipColors(accelChipGroup)
+        refreshAxisChipColors(gyroChipGroup)
+        if (sumChip.isChecked != useSum) {
+            sumChip.isChecked = useSum
+        } else {
+            viewModel.setUseSum(useSum)
+            waveformView.setShowSum(useSum)
+        }
+        viewModel.setEnabledChannels(channels)
+        waveformView.setEnabledChannels(channels)
+    }
+
+    private fun playSmoothSweep(token: Int, onDone: () -> Unit) {
+        if (token != tutorialAnimToken) return
+        val high = (waveSmoothSeekBar.max * 0.86f).toInt().coerceAtLeast(1)
+        val anim = ValueAnimator.ofInt(0, high).apply {
+            duration = 1100L
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = 1
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                if (token != tutorialAnimToken) return@addUpdateListener
+                waveSmoothSeekBar.setProgressNotify(it.animatedValue as Int)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (token != tutorialAnimToken) return
+                    applyWaveSmoothSec(0f)
+                    onDone()
+                }
+            })
+            start()
+        }
+        tutorialAnimators += anim
+    }
+
+    private fun playTimingTour() {
+        val savedMotion = viewModel.getMinMotionSec()
+        val savedRest = viewModel.getMinRestSec()
+        val savedWindow = waveformView.getTimeWindowSec()
+        tutorialRestore = {
+            viewModel.setMinMotionSec(savedMotion)
+            viewModel.setMinRestSec(savedRest)
+            motionGateSeekBar.progress = motionSecToProgress(savedMotion)
+            restGateSeekBar.progress = restSecToProgress(savedRest)
+            updateMotionGateUi()
+            updateRestGateUi()
+            refreshTimingOverlay()
+            waveformView.setTimeWindowSec(savedWindow, notify = false)
+        }
+        setWaveformPaused(true)
+        val clicks = waveformView.clickMarkerTimestamps()
+        val clickNs = clicks.lastOrNull()?.takeIf { it > 0L }
+            ?: waveformView.newestSampleNs()
+        waveformView.setTimeWindowSec(2.5f, notify = false)
+        if (clickNs > 0L) waveformView.panToTimestamp(clickNs)
+        motionGateSeekBar.setProgressNotify(0)
+        restGateSeekBar.setProgressNotify(0)
+        runTimingScript(tutorialAnimToken)
+    }
+
+    private fun runTimingScript(token: Int) {
+        if (token != tutorialAnimToken) return
+        // One gate at a time: rest 0.5 → motion 0.5 → rest 2 → motion 5.
+        val steps = listOf(
+            0f to 0.5f,
+            0.5f to 0f,
+            0f to 2f,
+            5f to 0f,
+        )
+        var cycle = 0
+        fun next() {
+            if (token != tutorialAnimToken) return
+            val (motionSec, restSec) = steps[cycle % steps.size]
+            cycle++
+            animateGatesTo(motionSec, restSec, 700L, token) {
+                tutorialHandler.postDelayed({ next() }, 1100L)
+            }
+        }
+        next()
+    }
+
+    private fun animateGatesTo(motionSec: Float, restSec: Float, duration: Long, token: Int, onEnd: () -> Unit) {
+        if (token != tutorialAnimToken) return
+        if (motionSec > 0f) {
+            setMotionScale(pickScale(motionSec, MOTION_SCALES), keepValue = true)
+        }
+        if (restSec > 0f) {
+            setRestScale(pickScale(restSec, REST_SCALES), keepValue = true)
+        }
+        val motionTarget = motionSecToProgress(motionSec.coerceIn(0f, motionScaleMaxSec))
+        val restTarget = restSecToProgress(restSec.coerceIn(0f, restScaleMaxSec))
+        when {
+            motionSec <= 0f && restSec <= 0f -> {
+                motionGateSeekBar.setProgressNotify(0)
+                restGateSeekBar.setProgressNotify(0)
+                onEnd()
+            }
+            motionSec <= 0f -> {
+                motionGateSeekBar.setProgressNotify(0)
+                animateSlider(restGateSeekBar, restTarget, duration, token, onEnd)
+            }
+            restSec <= 0f -> {
+                restGateSeekBar.setProgressNotify(0)
+                animateSlider(motionGateSeekBar, motionTarget, duration, token, onEnd)
+            }
+            else -> {
+                restGateSeekBar.setProgressNotify(0)
+                animateSlider(restGateSeekBar, restTarget, duration, token) {
+                    motionGateSeekBar.setProgressNotify(0)
+                    animateSlider(motionGateSeekBar, motionTarget, duration, token, onEnd)
+                }
+            }
+        }
+    }
+
+    private fun animateSlider(
+        slider: TdSliderView,
+        target: Int,
+        duration: Long,
+        token: Int,
+        onEnd: () -> Unit,
+    ) {
+        val from = slider.progress
+        if (from == target) {
+            slider.setProgressNotify(target)
+            onEnd()
+            return
+        }
+        val anim = ValueAnimator.ofInt(from, target).apply {
+            this.duration = duration
+            interpolator = LinearInterpolator()
+            addUpdateListener {
+                if (token != tutorialAnimToken) return@addUpdateListener
+                slider.setProgressNotify(it.animatedValue as Int)
+            }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (token != tutorialAnimToken) return
+                    onEnd()
+                }
+            })
+            start()
+        }
+        tutorialAnimators += anim
+    }
+
+    private data class ChannelTourState(
+        val channels: Set<SensorChannel>,
+        val useSum: Boolean,
+    )
 
     fun showTouchpad() {
         if (childFragmentManager.findFragmentByTag(TOUCHPAD_TAG) == null) {
@@ -813,6 +1149,7 @@ class MainFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        stopTutorialAnimations()
         stopStatusBlink()
         lightningBlinkAnimator?.cancel()
         lightningBlinkAnimator = null

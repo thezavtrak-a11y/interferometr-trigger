@@ -89,6 +89,11 @@ class TdSliderView @JvmOverloads constructor(
     }
     private val rect = RectF()
 
+    fun setProgressNotify(value: Int) {
+        progress = value.coerceIn(0, max)
+        listener?.invoke(progress, false)
+    }
+
     fun setOnProgressChangeListener(listener: ((progress: Int, fromUser: Boolean) -> Unit)?) {
         this.listener = listener
     }

@@ -10,4 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <com.example.arduhud.tutorial.TutorialOverlayView
+        android:id="@+id/tutorialOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:elevation="24dp"
+        android:focusable="false"
+        android:visibility="gone" />
+
 </FrameLayout>

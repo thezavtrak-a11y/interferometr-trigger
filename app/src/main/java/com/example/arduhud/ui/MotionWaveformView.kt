@@ -201,6 +201,8 @@ class MotionWaveformView @JvmOverloads constructor(
 
     fun getThreshold(): Float = threshold
 
+    fun visibleYMax(): Float = currentYMax()
+
     fun setTimeWindow(window: TimeWindowSec) {
         setTimeWindowSec(window.seconds.toFloat(), notify = false)
     }
@@ -275,6 +277,23 @@ class MotionWaveformView @JvmOverloads constructor(
     }
 
     fun isPaused(): Boolean = paused
+
+    fun clickMarkerTimestamps(): List<Long> = clickMarkersNs.toList()
+
+    fun newestSampleNs(): Long = samples.lastOrNull()?.timestampNs ?: 0L
+
+    fun panToTimestamp(ns: Long) {
+        if (!paused || pauseNewestNs <= 0L || ns <= 0L) return
+        panOffsetNs = pauseNewestNs - ns - windowNs() / 2L
+        clampPanOffset()
+        invalidate()
+    }
+
+    fun clearSamples() {
+        samples.clear()
+        clickMarkersNs.clear()
+        invalidate()
+    }
 
     fun addSample(
         timestampNs: Long,
@@ -529,7 +548,7 @@ class MotionWaveformView @JvmOverloads constructor(
             agePlaced.add(Placed(textX, textX + tw, textY))
 
             if (timingOverlay) {
-                drawTimingWindows(canvas, x, thresholdY, oldest, windowNs, w, h, markerNs)
+                drawTimingWindows(canvas, x, oldest, windowNs, w, h, markerNs)
             }
         }
 
@@ -557,7 +576,6 @@ class MotionWaveformView @JvmOverloads constructor(
     private fun drawTimingWindows(
         canvas: Canvas,
         clickX: Float,
-        thresholdY: Float,
         oldest: Long,
         windowNs: Long,
         w: Float,
@@ -574,8 +592,10 @@ class MotionWaveformView @JvmOverloads constructor(
         val motionStartX = ((motionStartNs - oldest).toFloat() / windowNs) * w
         val restEndX = ((restEndNs - oldest).toFloat() / windowNs) * w
 
-        val restY = thresholdY - dp(8f)
-        val motionY = thresholdY + dp(8f)
+        val gateTop = h * 2f / 3f
+        val band = h - gateTop
+        val restY = gateTop + band * 0.38f
+        val motionY = gateTop + band * 0.72f
 
         restWindowPaint.alpha = if (restGateEnabled) 255 else 110
         motionWindowPaint.alpha = if (motionGateEnabled) 255 else 110
@@ -584,8 +604,8 @@ class MotionWaveformView @JvmOverloads constructor(
         val motionTo = clickX.coerceIn(0f, w)
         if (motionTo > motionFrom) {
             canvas.drawLine(motionFrom, motionY, motionTo, motionY, motionWindowPaint)
-            canvas.drawLine(motionFrom, 0f, motionFrom, h, motionWindowPaint)
-            canvas.drawLine(motionTo, 0f, motionTo, h, motionWindowPaint)
+            canvas.drawLine(motionFrom, gateTop, motionFrom, h, motionWindowPaint)
+            canvas.drawLine(motionTo, gateTop, motionTo, h, motionWindowPaint)
             timingLabelPaint.color = motionWindowPaint.color
             timingLabelPaint.alpha = motionWindowPaint.alpha
             canvas.drawText(
@@ -600,8 +620,8 @@ class MotionWaveformView @JvmOverloads constructor(
         val restTo = restEndX.coerceIn(0f, w)
         if (restTo > restFrom) {
             canvas.drawLine(restFrom, restY, restTo, restY, restWindowPaint)
-            canvas.drawLine(restFrom, 0f, restFrom, h, restWindowPaint)
-            canvas.drawLine(restTo, 0f, restTo, h, restWindowPaint)
+            canvas.drawLine(restFrom, gateTop, restFrom, h, restWindowPaint)
+            canvas.drawLine(restTo, gateTop, restTo, h, restWindowPaint)
             timingLabelPaint.color = restWindowPaint.color
             timingLabelPaint.alpha = restWindowPaint.alpha
             canvas.drawText(

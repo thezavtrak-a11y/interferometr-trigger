@@ -22,10 +22,8 @@
     <string name="usb_status_connecting">USB: подключение…</string>
     <string name="usb_status_connected">USB: подключено (%1$s)</string>
 
-    <string name="activity_value_default">Активность: 0.00</string>
+    <string name="activity_value_default">Активность: 0.00 · покой</string>
     <string name="activity_value_channels">Активность: %1$.2f [%2$s] · %3$s</string>
-    <string name="detect_mode_sum">детект: сумма</string>
-    <string name="detect_mode_max">детект: максимум</string>
     <string name="channel_sum">Σ сумма</string>
     <string name="wave_smooth_label">Сглаживание (осц.+детект): %1$d мс</string>
     <string name="wave_smooth_label_off">Сглаживание (осц.+детект): выкл</string>
@@ -65,8 +63,9 @@
     <string name="window_60s">60 с</string>
     <string name="window_120s">120 с</string>
     <string name="touchpad_close">Закрыть тачпад</string>
-    <string name="state_rest">Состояние: покой</string>
-    <string name="state_moving">Состояние: движение</string>
+    <string name="state_rest">покой</string>
+    <string name="state_moving">движение</string>
+    <string name="link_toggle">Подключить или отключить связь</string>
 
     <string name="keep_screen_on_title">Не выключать экран</string>
     <string name="keep_screen_on_hint">По умолчанию выкл. Автовыкл. при ≤10% заряда — снова только вручную</string>
@@ -151,4 +150,43 @@
     <string name="click_stats_summary_head">Сессия %1$.1f с · кликов %2$d · смен направления %3$d</string>
     <string name="click_stats_summary_no_dirs">Нет кликов по направлениям.</string>
     <string name="click_stats_summary_dir">%1$s · n=%2$d · avg %3$s · min %4$s · max %5$s</string>
+
+    <string name="show_tutorial">Показать обучение</string>
+    <string name="tutorial_next">Вперёд</string>
+    <string name="tutorial_back">Назад</string>
+    <string name="tutorial_finish">Закончить</string>
+    <string name="tutorial_progress">%1$d / %2$d</string>
+
+    <string name="tutorial_title_waveform">Осциллограмма</string>
+    <string name="tutorial_body_waveform">Сетка — время (X) и амплитуда (Y). Щипок: вертикаль — масштаб Y, горизонталь — окно времени.</string>
+    <string name="tutorial_title_threshold">Порог</string>
+    <string name="tutorial_body_threshold">Оранжевый пунктир — порог срабатывания. Тяните линию. Выше порога — движение.</string>
+    <string name="tutorial_title_activity">Активность</string>
+    <string name="tutorial_body_activity">Величина по выбранным осям и покой/движение. На волне видно шкалу и всплески.</string>
+    <string name="tutorial_title_status">Связь</string>
+    <string name="tutorial_body_status">Точка: красная — нет связи, жёлтая — подключение, зелёная — на связи. Нажатие включает или выключает выбранный тип (BT HID / Wi‑Fi / USB).</string>
+    <string name="tutorial_title_pause">Пауза</string>
+    <string name="tutorial_body_pause">Стоп осциллограммы и детекта. Снова нажать — продолжить.</string>
+    <string name="tutorial_title_arm">Молния</string>
+    <string name="tutorial_body_arm">Активация передачи клика на ПК. Если задана точка клика — при активации курсор переместится в эту точку. Точка настраивается на экране эмуляции тачпада. Вспышка экрана — только здесь: клик ушёл на ПК.</string>
+    <string name="tutorial_title_channels">Каналы</string>
+    <string name="tutorial_body_channels">Тут можно выбрать, какие оси гироскопа и акселерометра учитывать при детектировании состояния. Также доступны суммирование всех выбранных осей и сглаживание осциллограммы.</string>
+    <string name="tutorial_title_timing">Тайминги</string>
+    <string name="tutorial_body_timing">Мин. время в движении и в покое. Момент срабатывания — вертикальная жёлтая линия на осциллограмме, если клик виден.</string>
+    <string name="tutorial_title_click">Клик по триггеру</string>
+    <string name="tutorial_body_click">Выше порога → мин. движение → покой → мин. покой → клик. Жёлтая вертикаль — момент клика.</string>
+    <string name="tutorial_title_mouse">Тачпад</string>
+    <string name="tutorial_body_mouse">Мышь на ПК. Нужен BT HID или ESP. Открывается поверх этой волны.</string>
+    <string name="tutorial_title_touchpad">Эмулятор тачпада</string>
+    <string name="tutorial_body_touchpad">Как тачпад ПК: 1 палец — курсор, тап — клик, удержание — ПКМ. Два пальца — прокрутка.</string>
+    <string name="tutorial_title_touchpad_pos">Зона курсора</string>
+    <string name="tutorial_body_touchpad_pos">После старта клика на ПК курсор едет в заданное место. «Найти» — ведите пальцем, «Запомнить» — сохранить.</string>
+    <string name="tutorial_title_stats">Статистика</string>
+    <string name="tutorial_body_stats">Журнал кликов сессии. Молния начинает запись.</string>
+    <string name="tutorial_title_journal">Журнал</string>
+    <string name="tutorial_body_journal">Время, направление, смена оси. Сводка — после отжатия молнии.</string>
+    <string name="tutorial_title_settings">Диалог настроек подключения</string>
+    <string name="tutorial_body_settings">Тип связи: BT HID к ПК, Wi‑Fi SoftAP или USB. Сначала выберите тип — панель откроется.</string>
+    <string name="tutorial_title_done">Готово</string>
+    <string name="tutorial_body_done">Обучение больше не всплывает само. Снова открыть — эта кнопка внизу настроек.</string>
 </resources>
